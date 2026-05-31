@@ -1,0 +1,53 @@
+PERHITUNGAN MANUAL MAMDANI FUZZY LOGIC CONTROLLER
+Kasus: obstacle depan transisi
+
+Data visual:
+x_c = 0.50
+B = 0.80
+A = 0.23
+T_vTTC = 2.80 s
+dlog(A) = 0.11
+C = 0.10
+
+Normalisasi:
+L = 0.000
+A_n = 0.511
+P = 0.699
+T_n = 0.711
+D_n = 0.611
+U = 0.781
+
+Fuzzifikasi:
+mu CENTER(L) = 1.000
+mu MEDIUM(P) = 0.404
+mu NEAR(P) = 0.288
+mu MEDIUM(U) = 0.076
+mu HIGH(U) = 0.207
+
+Rule aktif:
+Rule 1: CENTER, MEDIUM, MEDIUM -> RISK MEDIUM, SPEED SLOW, TURN RIGHT
+alpha_1 = 0.076
+
+Rule 2: CENTER, MEDIUM, HIGH -> RISK HIGH, SPEED SLOW, TURN RIGHT
+alpha_2 = 0.207
+
+Rule 3: CENTER, NEAR, MEDIUM -> RISK HIGH, SPEED STOP, TURN RIGHT
+alpha_3 = 0.076
+
+Rule 4: CENTER, NEAR, HIGH -> RISK HIGH, SPEED STOP, TURN RIGHT
+alpha_4 = 0.207
+
+Agregasi:
+RISK MEDIUM = 0.076
+RISK HIGH = 0.207
+SPEED SLOW = 0.207
+SPEED STOP = 0.207
+TURN RIGHT = 0.207
+
+Defuzzifikasi:
+Risk Score = 0.717
+Speed Factor = 0.278
+Turn Bias = 0.637
+
+Risk Class = HIGH
+Command = STOP
