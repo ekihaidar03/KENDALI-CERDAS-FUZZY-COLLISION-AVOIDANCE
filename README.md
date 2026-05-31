@@ -107,13 +107,13 @@ Visual proximity digunakan untuk memperkirakan tingkat kedekatan obstacle berdas
 Rasio area bounding box dinormalisasi dengan persamaan:
 
 $$
-A_n = \operatorname{clip}\left(\frac{A}{0.45}, 0, 1\right)
+A_n = \mathrm{clip}\left(\frac{A}{0.45}, 0, 1\right)
 $$
 
 Visual proximity dihitung sebagai:
 
 $$
-P = \operatorname{clip}\left(0.65B + 0.35A_n, 0, 1\right)
+P = \mathrm{clip}\left(0.65B + 0.35A_n, 0, 1\right)
 $$
 
 dengan:
@@ -127,22 +127,16 @@ dengan:
 
 Approach urgency digunakan untuk memperkirakan tingkat kedaruratan obstacle berdasarkan visual time-to-collision, perubahan ukuran area bounding box, dan status obstacle terhadap corridor lintasan.
 
-Komponen visual time-to-collision dinormalisasi sebagai:
-
-$$
-T_n = \frac{6.0 - T_{vTTC}}{4.5}
-$$
-
 Komponen perubahan area bounding box dinormalisasi sebagai:
 
 $$
-D_n = \operatorname{clip}\left(\frac{d\log(A)}{0.18}, 0, 1\right)
+D_n = \mathrm{clip}\left(\frac{d\log(A)}{0.18}, 0, 1\right)
 $$
 
 Approach urgency dihitung sebagai:
 
 $$
-U = \operatorname{clip}\left(0.70T_n + 0.30D_n + C, 0, 1\right)
+U = \mathrm{clip}\left(0.70T_n + 0.30D_n + C, 0, 1\right)
 $$
 
 dengan:
