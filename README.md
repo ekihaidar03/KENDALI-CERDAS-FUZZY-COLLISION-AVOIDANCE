@@ -74,9 +74,17 @@ Data visual dari kamera tidak langsung dimasukkan ke sistem fuzzy. Data terlebih
 
 ### 4.1 Lateral Position
 
-\[
+## 4. Persamaan Normalisasi Input
+
+Data visual dari kamera tidak langsung dimasukkan ke sistem fuzzy. Data terlebih dahulu diubah menjadi tiga input crisp fuzzy, yaitu **Lateral Position**, **Visual Proximity**, dan **Approach Urgency**.
+
+### 4.1 Lateral Position
+
+Lateral position digunakan untuk menyatakan posisi obstacle terhadap titik tengah citra kamera.
+
+$$
 L = 2(x_c - 0.5)
-\]
+$$
 
 dengan:
 
@@ -86,25 +94,27 @@ dengan:
 
 Jika obstacle berada pada corridor lintasan, program dapat menerapkan koreksi lateral:
 
-\[
+$$
 L_c = 0.55L
-\]
+$$
 
-Koreksi ini digunakan agar obstacle yang berada dalam corridor lebih diperlakukan sebagai obstacle depan, bukan terlalu cepat dianggap obstacle samping.
+Koreksi ini digunakan agar obstacle yang berada di dalam corridor lintasan lebih diperlakukan sebagai obstacle depan, bukan terlalu cepat dianggap sebagai obstacle samping.
 
 ### 4.2 Visual Proximity
 
+Visual proximity digunakan untuk memperkirakan tingkat kedekatan obstacle berdasarkan posisi bawah bounding box dan rasio area bounding box.
+
 Rasio area bounding box dinormalisasi dengan persamaan:
 
-\[
-A_n = \text{clip}\left(\frac{A}{0.45},0,1\right)
-\]
+$$
+A_n = \operatorname{clip}\left(\frac{A}{0.45}, 0, 1\right)
+$$
 
 Visual proximity dihitung sebagai:
 
-\[
-P = \text{clip}(0.65B + 0.35A_n,0,1)
-\]
+$$
+P = \operatorname{clip}\left(0.65B + 0.35A_n, 0, 1\right)
+$$
 
 dengan:
 
@@ -115,30 +125,32 @@ dengan:
 
 ### 4.3 Approach Urgency
 
+Approach urgency digunakan untuk memperkirakan tingkat kedaruratan obstacle berdasarkan visual time-to-collision, perubahan ukuran area bounding box, dan status obstacle terhadap corridor lintasan.
+
 Komponen visual time-to-collision dinormalisasi sebagai:
 
-\[
+$$
 T_n = \frac{6.0 - T_{vTTC}}{4.5}
-\]
+$$
 
-Komponen perubahan area dinormalisasi sebagai:
+Komponen perubahan area bounding box dinormalisasi sebagai:
 
-\[
-D_n = \text{clip}\left(\frac{d\log(A)}{0.18},0,1\right)
-\]
+$$
+D_n = \operatorname{clip}\left(\frac{d\log(A)}{0.18}, 0, 1\right)
+$$
 
 Approach urgency dihitung sebagai:
 
-\[
-U = \text{clip}(0.70T_n + 0.30D_n + C,0,1)
-\]
+$$
+U = \operatorname{clip}\left(0.70T_n + 0.30D_n + C, 0, 1\right)
+$$
 
 dengan:
 
 - \(U\) adalah approach urgency.
 - \(T_{vTTC}\) adalah visual time-to-collision.
 - \(d\log(A)\) adalah perubahan logaritmik area bounding box.
-- \(C\) adalah corridor bonus. Nilainya 0,10 jika obstacle berada pada corridor lintasan dan 0 jika tidak.
+- \(C\) adalah corridor bonus. Nilainya 0.10 jika obstacle berada pada corridor lintasan dan 0 jika tidak.
 
 ## 5. Fungsi Keanggotaan
 
@@ -146,67 +158,94 @@ Sistem menggunakan kombinasi fungsi keanggotaan segitiga dan trapesium. Fungsi s
 
 ### 5.1 Fungsi Segitiga
 
-\[
+Fungsi keanggotaan segitiga dinyatakan sebagai:
+
+$$
 \mu(x;a,b,c)=
 \begin{cases}
 0, & x \leq a \text{ atau } x \geq c \\
-\frac{x-a}{b-a}, & a < x \leq b \\
-\frac{c-x}{c-b}, & b < x < c
+\dfrac{x-a}{b-a}, & a < x \leq b \\
+\dfrac{c-x}{c-b}, & b < x < c
 \end{cases}
-\]
+$$
 
 ### 5.2 Fungsi Trapesium
 
-\[
+Fungsi keanggotaan trapesium dinyatakan sebagai:
+
+$$
 \mu(x;a,b,c,d)=
 \begin{cases}
 0, & x \leq a \text{ atau } x \geq d \\
-\frac{x-a}{b-a}, & a < x < b \\
+\dfrac{x-a}{b-a}, & a < x < b \\
 1, & b \leq x \leq c \\
-\frac{d-x}{d-c}, & c < x < d
+\dfrac{d-x}{d-c}, & c < x < d
 \end{cases}
-\]
+$$
 
-## 6. Rule Base
+Pada rancangan ini, bentuk trapesium juga digunakan sebagai shoulder function. Contohnya adalah himpunan paling kiri dan paling kanan, seperti LEFT, RIGHT, FAR, NEAR, LOW, HIGH, STOP, dan NORMAL.
 
-Rule base terdiri dari 27 aturan karena sistem memiliki 3 input fuzzy, masing-masing dengan 3 himpunan linguistik.
+## 6. Rule Base dan Inferensi Mamdani
 
-Jumlah rule:
+Rule base terdiri dari 27 aturan karena sistem memiliki tiga input fuzzy dan masing-masing input memiliki tiga himpunan linguistik.
 
-\[
+$$
 3 \times 3 \times 3 = 27
-\]
+$$
 
 Bentuk umum rule Mamdani yang digunakan adalah:
 
-\[
+$$
 \text{IF } L \text{ is } A_1 \text{ AND } P \text{ is } A_2 \text{ AND } U \text{ is } A_3
-\]
+$$
 
-\[
-\text{THEN Risk is } B_1, \text{ Speed is } B_2, \text{ Turn is } B_3
-\]
+$$
+\text{THEN Risk is } B_1,\ \text{Speed is } B_2,\ \text{Turn is } B_3
+$$
 
-Operator AND dihitung menggunakan minimum:
+Operator AND pada bagian antecedent dihitung menggunakan operator minimum.
 
-\[
-\alpha_i = \min(\mu_{A_1}(L), \mu_{A_2}(P), \mu_{A_3}(U))
-\]
+$$
+\alpha_i =
+\min\left(
+\mu_{A_1}(L),
+\mu_{A_2}(P),
+\mu_{A_3}(U)
+\right)
+$$
 
-Output dari beberapa rule yang menghasilkan himpunan sama digabungkan menggunakan maksimum:
+dengan \(\alpha_i\) adalah firing strength rule ke-\(i\).
 
-\[
-\mu_B(y) = \max(\mu_{B_1}(y), \mu_{B_2}(y), ..., \mu_{B_n}(y))
-\]
+Implikasi Mamdani dilakukan dengan metode clipping.
 
-Defuzzifikasi dilakukan dengan metode centroid:
+$$
+\mu'_{B_i}(y) =
+\min\left(
+\alpha_i,\mu_{B_i}(y)
+\right)
+$$
 
-\[
+Jika terdapat beberapa rule yang menghasilkan output fuzzy yang sama, maka output tersebut digabungkan menggunakan operator maksimum.
+
+$$
+\mu_B(y) =
+\max\left(
+\mu'_{B_1}(y),
+\mu'_{B_2}(y),
+...,
+\mu'_{B_n}(y)
+\right)
+$$
+
+Defuzzifikasi dilakukan menggunakan metode centroid.
+
+$$
 y^* =
 \frac{\sum_{k=1}^{N} y_k \mu(y_k)}
 {\sum_{k=1}^{N} \mu(y_k)}
-\]
+$$
 
+Nilai crisp hasil defuzzifikasi kemudian digunakan untuk menentukan risk score, speed factor, turn bias, risk class, dan command akhir.
 ## 7. Struktur Repository
 
 ```text
@@ -459,67 +498,3 @@ Hasil defuzzifikasi:
 | Turn Bias    | 0.637 |
 
 Karena nilai risk score lebih besar dari 0,60, maka sistem mengklasifikasikan kondisi sebagai HIGH.
-
-[
-R = 0.717
-]
-
-[
-R \geq 0.60
-]
-
-[
-\text{Risk Class} = \text{HIGH}
-]
-
-Command akhir:
-
-```text
-STOP
-```
-
-Keputusan STOP diprioritaskan karena obstacle berada pada kondisi risiko tinggi. Walaupun turn bias menunjukkan kecenderungan belok kanan, command STOP tetap dipilih sebagai respons konservatif untuk keselamatan navigasi.
-
-## 13. Catatan Engineering
-
-Program ini adalah alat simulasi dan analisis fuzzy untuk tugas Kendali Cerdas. Hasil simulasi dapat digunakan untuk mendukung pembahasan rancangan sistem, tetapi tidak boleh dianggap sebagai validasi keselamatan fisik final.
-
-Validasi keselamatan fisik tetap harus dilakukan melalui pengujian langsung pada USV SEANO dengan prosedur pengujian yang aman, terdokumentasi, dan diawasi operator.
-
-## 14. Cara Push Perubahan ke GitHub
-
-Cek status repository:
-
-```powershell
-git status
-```
-
-Tambahkan file yang berubah:
-
-```powershell
-git add README.md
-git add fuzzy_lab.py
-git add results
-git add archive
-git add .gitignore
-```
-
-Commit:
-
-```powershell
-git commit -m "Update README and document fuzzy lab workflow"
-```
-
-Push ke GitHub:
-
-```powershell
-git push origin main
-```
-
-Jika tidak ada perubahan baru, Git akan menampilkan pesan bahwa working tree sudah bersih.
-
-## 15. Lisensi dan Penggunaan
-
-Repository ini dibuat untuk kebutuhan akademik pada tugas Kendali Cerdas dan pengembangan Tugas Akhir terkait collision avoidance USV SEANO. Program dapat dikembangkan lebih lanjut untuk integrasi dengan sistem nyata, tetapi setiap integrasi ke perangkat fisik harus melalui validasi teknis dan pengujian keselamatan yang memadai.
-
-````
