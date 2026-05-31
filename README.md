@@ -240,6 +240,71 @@ y^* =
 $$
 
 Nilai crisp hasil defuzzifikasi kemudian digunakan untuk menentukan risk score, speed factor, turn bias, risk class, dan command akhir.
+
+## Dokumentasi Visual Sistem
+
+Beberapa ilustrasi berikut digunakan untuk menunjukkan proses perancangan dan simulasi Mamdani Fuzzy Logic Controller pada sistem collision avoidance USV SEANO.
+
+### Membership Function Input
+
+Input fuzzy terdiri dari lateral position, visual proximity, dan approach urgency. Ketiga input ini digunakan untuk merepresentasikan posisi obstacle, indikasi kedekatan obstacle, dan tingkat kedaruratan obstacle terhadap lintasan USV.
+
+<p align="center">
+  <img src="docs/images/membership_lateral_position.png" width="650">
+</p>
+
+<p align="center">
+  <b>Gambar 1.</b> Membership function input Lateral Position.
+</p>
+
+<p align="center">
+  <img src="docs/images/membership_visual_proximity.png" width="650">
+</p>
+
+<p align="center">
+  <b>Gambar 2.</b> Membership function input Visual Proximity.
+</p>
+
+<p align="center">
+  <img src="docs/images/membership_approach_urgency.png" width="650">
+</p>
+
+<p align="center">
+  <b>Gambar 3.</b> Membership function input Approach Urgency.
+</p>
+
+### Surface Viewer
+
+Surface viewer digunakan untuk melihat pengaruh kombinasi dua input fuzzy terhadap output sistem. Karena sistem memiliki tiga input, satu input dibuat tetap saat surface viewer ditampilkan.
+
+<p align="center">
+  <img src="docs/images/surface_risk_proximity_urgency.png" width="700">
+</p>
+
+<p align="center">
+  <b>Gambar 4.</b> Surface viewer Risk Score terhadap Visual Proximity dan Approach Urgency.
+</p>
+
+### Proses Mamdani Manual
+
+Gambar berikut menunjukkan proses clipping, agregasi, dan defuzzifikasi centroid pada contoh kasus obstacle depan transisi.
+
+<p align="center">
+  <img src="docs/images/manual_mamdani_risk_score.png" width="700">
+</p>
+
+<p align="center">
+  <b>Gambar 5.</b> Clipping dan agregasi output Risk Score.
+</p>
+
+<p align="center">
+  <img src="docs/images/manual_mamdani_outputs.png" width="700">
+</p>
+
+<p align="center">
+  <b>Gambar 6.</b> Clipping, agregasi, dan defuzzifikasi untuk Risk Score, Speed Factor, dan Turn Bias.
+</p>
+
 ## 7. Struktur Repository
 
 ```text
