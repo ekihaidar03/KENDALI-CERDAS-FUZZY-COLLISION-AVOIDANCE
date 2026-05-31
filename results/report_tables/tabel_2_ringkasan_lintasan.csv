@@ -1,0 +1,6 @@
+﻿No,Skenario,Posisi Akhir X (m),Posisi Akhir Y (m),Deviasi Lateral Maks. (m),Kecepatan Rata-rata (m/s),Kecepatan Minimum (m/s),Jarak Minimum Simulatif (m),Jumlah Pergantian Command
+1,Crossing kiri ke kanan,1.501,11.855,2.234,0.637,0.385,0.411,4
+2,Crossing kanan ke kiri,1.137,11.936,1.665,0.637,0.385,2.250,5
+3,Obstacle frontal statis,2.166,7.532,2.166,0.422,0.000,2.445,2
+4,Tanpa obstacle,0.000,17.783,0.000,0.880,0.880,-,0
+5,Obstacle samping aman,0.000,17.206,0.000,0.852,0.846,5.000,0

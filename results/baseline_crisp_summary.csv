@@ -1,0 +1,6 @@
+scenario,jumlah_data,risk_class_match_percent,command_match_percent,fuzzy_command_count,crisp_command_count,fuzzy_risk_max,crisp_risk_max
+crossing_left_to_right,101,83.17,73.27,"{'HOLD_COURSE': 53, 'SLOW_DOWN': 15, 'TURN_RIGHT_SLOW': 33}","{'HOLD_COURSE': 70, 'SLOW_DOWN': 10, 'TURN_RIGHT_SLOW': 21}",0.45,0.5
+crossing_right_to_left,101,83.17,73.27,"{'HOLD_COURSE': 53, 'TURN_LEFT_SLOW': 9, 'SLOW_DOWN': 8, 'TURN_RIGHT_SLOW': 31}","{'HOLD_COURSE': 70, 'SLOW_DOWN': 10, 'TURN_RIGHT_SLOW': 21}",0.45,0.5
+frontal_static_obstacle,101,74.26,68.32,"{'HOLD_COURSE': 31, 'TURN_RIGHT_SLOW': 41, 'STOP': 29}","{'HOLD_COURSE': 42, 'SLOW_DOWN': 6, 'TURN_RIGHT_SLOW': 39, 'STOP': 14}",0.847,0.85
+no_obstacle,101,100.0,100.0,{'HOLD_COURSE': 101},{'HOLD_COURSE': 101},0.1365,0.15
+side_safe_obstacle,101,100.0,100.0,{'HOLD_COURSE': 101},{'HOLD_COURSE': 101},0.1605,0.15

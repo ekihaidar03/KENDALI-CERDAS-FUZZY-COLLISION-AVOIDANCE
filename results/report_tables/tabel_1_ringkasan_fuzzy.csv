@@ -1,0 +1,6 @@
+﻿No,Skenario,Jumlah Data,Risk Minimum,Risk Maksimum,Risk Rata-rata,Speed Rata-rata,Distribusi Command,Distribusi Risk Class
+1,Crossing kiri ke kanan,101,0.147,0.450,0.295,0.579,"{'HOLD_COURSE': 53, 'TURN_RIGHT_SLOW': 33, 'SLOW_DOWN': 15}","{'LOW': 53, 'MEDIUM': 48}"
+2,Crossing kanan ke kiri,101,0.147,0.450,0.295,0.579,"{'HOLD_COURSE': 53, 'TURN_RIGHT_SLOW': 31, 'TURN_LEFT_SLOW': 9, 'SLOW_DOWN': 8}","{'LOW': 53, 'MEDIUM': 48}"
+3,Obstacle frontal statis,101,0.137,0.847,0.452,0.427,"{'TURN_RIGHT_SLOW': 41, 'HOLD_COURSE': 31, 'STOP': 29}","{'MEDIUM': 41, 'LOW': 31, 'HIGH': 29}"
+4,Tanpa obstacle,101,0.137,0.137,0.137,0.800,{'HOLD_COURSE': 101},{'LOW': 101}
+5,Obstacle samping aman,101,0.153,0.161,0.156,0.774,{'HOLD_COURSE': 101},{'LOW': 101}

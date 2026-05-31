@@ -1,0 +1,6 @@
+﻿No,Skenario,Risk Maksimum,Command Count,Jarak Minimum Simulatif (m),Status Validasi Simulasi,Catatan Analisis
+1,Crossing kiri ke kanan,0.450,"{'HOLD_COURSE': 53, 'TURN_RIGHT_SLOW': 33, 'SLOW_DOWN': 15}",0.411,Valid simulatif - crossing terdeteksi sebagai risiko MEDIUM,Skenario crossing paling kritis; respons fuzzy menurunkan kecepatan dan menjaga risk pada kelas MEDIUM.
+2,Crossing kanan ke kiri,0.450,"{'HOLD_COURSE': 53, 'TURN_RIGHT_SLOW': 31, 'TURN_LEFT_SLOW': 9, 'SLOW_DOWN': 8}",2.250,Valid simulatif - crossing terdeteksi sebagai risiko MEDIUM,Obstacle crossing tetap berada pada kelas MEDIUM dan tidak mencapai kondisi STOP.
+3,Obstacle frontal statis,0.847,"{'TURN_RIGHT_SLOW': 41, 'HOLD_COURSE': 31, 'STOP': 29}",2.445,Valid - sistem melakukan STOP pada obstacle frontal,"Obstacle frontal menghasilkan kondisi HIGH dan command STOP, sesuai respons konservatif."
+4,Tanpa obstacle,0.137,{'HOLD_COURSE': 101},-,Valid - sistem mempertahankan HOLD_COURSE,Tidak ada obstacle; sistem mempertahankan lintasan tanpa pergantian command.
+5,Obstacle samping aman,0.161,{'HOLD_COURSE': 101},5.000,Valid - obstacle samping tidak memicu avoidance,Obstacle berada di sisi luar corridor sehingga sistem tetap HOLD_COURSE.

@@ -1,0 +1,34 @@
+RINGKASAN HASIL SIMULASI FUZZY COLLISION AVOIDANCE
+==============================================================
+
+1. Crossing kiri ke kanan
+   Risk maksimum                : 0,450
+   Jarak minimum simulatif      : 0,411 m
+   Status                       : Valid simulatif - crossing terdeteksi sebagai risiko MEDIUM
+   Catatan                      : Skenario crossing paling kritis; fuzzy controller menurunkan kecepatan dan menjaga risk pada kelas MEDIUM.
+
+2. Crossing kanan ke kiri
+   Risk maksimum                : 0,450
+   Jarak minimum simulatif      : 2,250 m
+   Status                       : Valid simulatif - crossing terdeteksi sebagai risiko MEDIUM
+   Catatan                      : Obstacle crossing tetap berada pada kelas MEDIUM dan tidak mencapai kondisi STOP.
+
+3. Obstacle frontal statis
+   Risk maksimum                : 0,847
+   Jarak minimum simulatif      : 2,445 m
+   Status                       : Valid - sistem melakukan STOP pada obstacle frontal
+   Catatan                      : Obstacle frontal menghasilkan risk HIGH dan command STOP, sesuai respons konservatif collision avoidance.
+
+4. Tanpa obstacle
+   Risk maksimum                : 0,137
+   Jarak minimum simulatif      : - m
+   Status                       : Valid - sistem mempertahankan HOLD_COURSE
+   Catatan                      : Tidak ada obstacle; sistem mempertahankan lintasan tanpa pergantian command.
+
+5. Obstacle samping aman
+   Risk maksimum                : 0,161
+   Jarak minimum simulatif      : 5,000 m
+   Status                       : Valid - obstacle samping tidak memicu avoidance
+   Catatan                      : Obstacle berada di sisi luar corridor sehingga sistem tetap HOLD_COURSE.
+
+Catatan engineering: hasil ini digunakan sebagai validasi awal berbasis simulasi. Validasi keselamatan fisik final tetap memerlukan uji langsung pada USV SEANO.

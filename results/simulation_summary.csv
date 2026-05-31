@@ -1,0 +1,6 @@
+scenario,jumlah_data,risk_min,risk_max,risk_mean,speed_mean,command_count,risk_class_count
+crossing_left_to_right,101,0.1475,0.45,0.2955,0.579,"{'HOLD_COURSE': 53, 'TURN_RIGHT_SLOW': 33, 'SLOW_DOWN': 15}","{'LOW': 53, 'MEDIUM': 48}"
+crossing_right_to_left,101,0.1475,0.45,0.2955,0.579,"{'HOLD_COURSE': 53, 'TURN_RIGHT_SLOW': 31, 'TURN_LEFT_SLOW': 9, 'SLOW_DOWN': 8}","{'LOW': 53, 'MEDIUM': 48}"
+frontal_static_obstacle,101,0.1365,0.847,0.452,0.427,"{'TURN_RIGHT_SLOW': 41, 'HOLD_COURSE': 31, 'STOP': 29}","{'MEDIUM': 41, 'LOW': 31, 'HIGH': 29}"
+no_obstacle,101,0.1365,0.1365,0.1365,0.8003,{'HOLD_COURSE': 101},{'LOW': 101}
+side_safe_obstacle,101,0.1534,0.1605,0.1562,0.7743,{'HOLD_COURSE': 101},{'LOW': 101}

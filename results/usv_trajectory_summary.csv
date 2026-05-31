@@ -1,0 +1,6 @@
+scenario,final_x_m,final_y_m,max_abs_cross_track_m,mean_speed_mps,min_speed_mps,min_distance_to_obstacle_m,command_switch_count
+crossing_left_to_right,1.5008,11.855,2.2341,0.6369,0.385,0.4106,4
+crossing_right_to_left,1.1375,11.9358,1.6655,0.6369,0.385,2.2499,5
+frontal_static_obstacle,2.1657,7.5318,2.1657,0.4216,0.0,2.445,2
+no_obstacle,0.0,17.7827,0.0,0.8803,0.8803,,0
+side_safe_obstacle,0.0,17.2056,0.0,0.8518,0.8455,5.0001,0

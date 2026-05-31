@@ -1,0 +1,6 @@
+﻿No;Skenario;Jumlah data;Risk minimum;Risk maksimum;Risk rata-rata;Speed rata-rata;Jumlah HOLD_COURSE;Jumlah SLOW_DOWN;Jumlah TURN_LEFT_SLOW;Jumlah TURN_RIGHT_SLOW;Jumlah STOP;Jumlah LOW;Jumlah MEDIUM;Jumlah HIGH
+1;Crossing kiri ke kanan;101;0,147;0,450;0,295;0,579;53;15;0;33;0;53;48;0
+2;Crossing kanan ke kiri;101;0,147;0,450;0,295;0,579;53;8;9;31;0;53;48;0
+3;Obstacle frontal statis;101;0,137;0,847;0,452;0,427;31;0;0;41;29;31;41;29
+4;Tanpa obstacle;101;0,137;0,137;0,137;0,800;101;0;0;0;0;101;0;0
+5;Obstacle samping aman;101;0,153;0,161;0,156;0,774;101;0;0;0;0;101;0;0

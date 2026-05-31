@@ -1,0 +1,47 @@
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Jupyter / notebook cache
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Excel temporary lock files
+~$*.xlsx
+~$*.xls
+~$*.csv
+
+# Matplotlib / tool cache
+.cache/
+
+# Runtime logs
+*.log
+
+# Optional: raw generated result files that can be regenerated
+# Jika kamu mau hasil simulasi ikut di-push, biarkan bagian ini tetap dikomentari.
+# results/
+
+# Keep important generated report outputs if results/ is ignored later
+# !results/report_tables/
+# !results/figures_report/
+# !results/run_summary.txt

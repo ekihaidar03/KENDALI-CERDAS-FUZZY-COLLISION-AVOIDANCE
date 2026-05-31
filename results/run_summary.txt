@@ -1,0 +1,30 @@
+RINGKASAN EKSEKUSI PIPELINE FUZZY COLLISION AVOIDANCE
+====================================================================
+
+Waktu eksekusi: 2026-05-31 16:53:06
+Python       : C:\Users\Muhammad Naufal H.R\collision_avoidance_mamdani_fuzzy\.venv\Scripts\python.exe
+
+- fuzzy_controller.py : BERHASIL
+- scenario_generator.py : BERHASIL
+- baseline_crisp.py : BERHASIL
+- usv_simulator.py : BERHASIL
+- plot_results.py : BERHASIL
+- plot_results_report.py : BERHASIL
+- report_tables.py : BERHASIL
+- excel_report_generator.py : BERHASIL
+
+Output utama yang diharapkan:
+- results/simulation_log.csv
+- results/simulation_summary.csv
+- results/baseline_crisp_log.csv
+- results/baseline_crisp_summary.csv
+- results/usv_trajectory_log.csv
+- results/usv_trajectory_summary.csv
+- results/figures/
+- results/figures_report/
+- results/report_tables/tabel_3_validasi_skenario_rapih.csv
+- results/report_tables/laporan_simulasi_fuzzy_seano.xlsx
+
+Catatan:
+File Excel laporan harus ditutup terlebih dahulu sebelum pipeline dijalankan ulang, karena Python tidak bisa menimpa file .xlsx yang masih terbuka di Excel.
+File baseline_crisp.py digunakan sebagai pembanding rule threshold biasa terhadap fuzzy controller. Baseline ini bukan metode utama.
