@@ -1,314 +1,525 @@
 # Simulasi Mamdani Fuzzy Logic Controller untuk Collision Avoidance USV SEANO
 
-Project ini berisi rancangan dan simulasi **Mamdani Fuzzy Logic Controller** untuk sistem **collision avoidance berbasis kamera** pada USV SEANO. Program ini dibuat sebagai bagian dari tugas Kendali Cerdas dengan tema Tugas Akhir:
+Repository ini berisi rancangan dan simulasi Mamdani Fuzzy Logic Controller untuk sistem collision avoidance berbasis kamera pada USV SEANO. Program dibuat sebagai bagian dari tugas Kendali Cerdas dengan tema Tugas Akhir:
 
 **Implementasi Sistem Collision Avoidance dengan Pendekatan Artificial Intelligence untuk Meningkatkan Keselamatan Navigasi pada USV SEANO**
 
-Metode yang digunakan adalah **Fuzzy Logic Controller tipe Mamdani**. Sistem menerima parameter visual obstacle seperti posisi lateral, kedekatan visual, dan urgensi pendekatan. Parameter tersebut diproses melalui fuzzifikasi, rule base, inferensi Mamdani, dan defuzzifikasi centroid untuk menghasilkan keputusan manuver berupa `HOLD_COURSE`, `SLOW_DOWN`, `TURN_LEFT_SLOW`, `TURN_RIGHT_SLOW`, atau `STOP`.
+Sistem ini dirancang sebagai alat simulasi dan analisis fuzzy berbasis Python. Program dapat digunakan untuk menghitung respons collision avoidance dari data visual obstacle, menampilkan proses fuzzifikasi, menjalankan rule base Mamdani, melakukan defuzzifikasi centroid, serta menghasilkan grafik dan tabel hasil simulasi.
 
----
+## 1. Tujuan Program
 
-## 1. Tujuan Project
+Program ini dibuat untuk menggantikan kebutuhan dasar MATLAB Fuzzy Logic Toolbox dalam konteks tugas Kendali Cerdas. Fokus utama program adalah simulasi Mamdani Fuzzy Logic Controller untuk mendukung pengambilan keputusan collision avoidance pada USV berbasis kamera.
 
-Tujuan project ini adalah membuat simulasi awal sistem collision avoidance berbasis fuzzy untuk mengevaluasi hubungan antara parameter visual kamera dan keputusan kendali USV.
+Fungsi utama program meliputi:
 
-Secara khusus, project ini digunakan untuk:
+1. Mengolah data visual obstacle menjadi input fuzzy.
+2. Menghitung derajat keanggotaan input.
+3. Menjalankan rule base Mamdani sebanyak 27 aturan.
+4. Menghasilkan output fuzzy berupa risk score, speed factor, dan turn bias.
+5. Melakukan defuzzifikasi dengan metode centroid.
+6. Menentukan risk class dan command akhir.
+7. Menghasilkan grafik membership function, surface viewer, grafik clipping, tabel CSV, dan workbook Excel laporan.
 
-1. Merancang Fuzzy Logic Controller berbasis parameter visual.
-2. Membuat skenario obstacle sintetik yang menyerupai kondisi navigasi USV.
-3. Membandingkan hasil fuzzy dengan baseline crisp rule.
-4. Menyimulasikan lintasan sederhana USV berdasarkan output fuzzy.
-5. Menghasilkan grafik, CSV, dan workbook Excel yang siap digunakan untuk laporan teknik.
+## 2. Metode yang Digunakan
 
----
+Metode soft computing yang digunakan adalah **Mamdani Fuzzy Logic Controller**. Metode ini dipilih karena mampu merepresentasikan keputusan berbasis aturan linguistik, sehingga cocok untuk sistem collision avoidance yang memiliki kondisi tidak pasti akibat penggunaan kamera sebagai sensor utama.
 
-## 2. Batasan Engineering
+Tahapan inferensi fuzzy yang digunakan adalah:
 
-Project ini adalah **validasi awal berbasis simulasi kinematik**, bukan validasi keselamatan fisik final.
+1. Normalisasi input visual.
+2. Fuzzifikasi.
+3. Evaluasi rule menggunakan operator minimum.
+4. Implikasi Mamdani menggunakan clipping.
+5. Agregasi output menggunakan operator maksimum.
+6. Defuzzifikasi menggunakan centroid.
+7. Penentuan risk class dan command navigasi.
 
-Nilai jarak minimum, lintasan, dan command pada simulasi dihitung dari model sederhana di Python. Oleh karena itu, hasil ini belum boleh diklaim sebagai bukti keselamatan fisik final pada USV nyata.
+## 3. Variabel Input dan Output
 
-Validasi fisik final tetap memerlukan pengujian langsung pada USV SEANO dengan log runtime, video pengujian, observasi operator, dan data kondisi aktual di lapangan.
+### 3.1 Input Fuzzy
 
----
+Sistem menggunakan tiga input fuzzy.
 
-## 3. Struktur Program
+| No | Input | Range | Keterangan |
+|---:|---|---:|---|
+| 1 | Lateral Position | -1 sampai 1 | Posisi lateral obstacle terhadap tengah citra |
+| 2 | Visual Proximity | 0 sampai 1 | Indikasi kedekatan obstacle berdasarkan bounding box |
+| 3 | Approach Urgency | 0 sampai 1 | Indikasi tingkat kedaruratan obstacle mendekati USV |
+
+### 3.2 Output Fuzzy
+
+Sistem menghasilkan tiga output fuzzy.
+
+| No | Output | Range | Keterangan |
+|---:|---|---:|---|
+| 1 | Risk Score | 0 sampai 1 | Nilai risiko collision avoidance |
+| 2 | Speed Factor | 0 sampai 1 | Faktor pengurangan kecepatan |
+| 3 | Turn Bias | -1 sampai 1 | Arah kecenderungan belok |
+
+### 3.3 Command Akhir
+
+Command akhir ditentukan berdasarkan hasil risk score, speed factor, dan turn bias.
+
+| Command | Keterangan |
+|---|---|
+| HOLD_COURSE | USV mempertahankan lintasan |
+| SLOW_DOWN | USV mengurangi kecepatan |
+| TURN_LEFT_SLOW | USV berbelok pelan ke kiri |
+| TURN_RIGHT_SLOW | USV berbelok pelan ke kanan |
+| STOP | USV berhenti karena kondisi risiko tinggi |
+
+## 4. Persamaan Normalisasi Input
+
+Data visual dari kamera tidak langsung dimasukkan ke sistem fuzzy. Data terlebih dahulu diubah menjadi tiga input crisp fuzzy.
+
+### 4.1 Lateral Position
+
+\[
+L = 2(x_c - 0.5)
+\]
+
+dengan:
+
+- \(L\) adalah lateral position.
+- \(x_c\) adalah posisi pusat bounding box pada sumbu horizontal citra.
+- Nilai \(x_c\) berada pada rentang 0 sampai 1.
+
+Jika obstacle berada pada corridor lintasan, program dapat menerapkan koreksi lateral:
+
+\[
+L_c = 0.55L
+\]
+
+Koreksi ini digunakan agar obstacle yang berada dalam corridor lebih diperlakukan sebagai obstacle depan, bukan terlalu cepat dianggap obstacle samping.
+
+### 4.2 Visual Proximity
+
+Rasio area bounding box dinormalisasi dengan persamaan:
+
+\[
+A_n = \text{clip}\left(\frac{A}{0.45},0,1\right)
+\]
+
+Visual proximity dihitung sebagai:
+
+\[
+P = \text{clip}(0.65B + 0.35A_n,0,1)
+\]
+
+dengan:
+
+- \(P\) adalah visual proximity.
+- \(B\) adalah posisi bawah bounding box.
+- \(A\) adalah rasio area bounding box.
+- \(A_n\) adalah rasio area yang telah dinormalisasi.
+
+### 4.3 Approach Urgency
+
+Komponen visual time-to-collision dinormalisasi sebagai:
+
+\[
+T_n = \frac{6.0 - T_{vTTC}}{4.5}
+\]
+
+Komponen perubahan area dinormalisasi sebagai:
+
+\[
+D_n = \text{clip}\left(\frac{d\log(A)}{0.18},0,1\right)
+\]
+
+Approach urgency dihitung sebagai:
+
+\[
+U = \text{clip}(0.70T_n + 0.30D_n + C,0,1)
+\]
+
+dengan:
+
+- \(U\) adalah approach urgency.
+- \(T_{vTTC}\) adalah visual time-to-collision.
+- \(d\log(A)\) adalah perubahan logaritmik area bounding box.
+- \(C\) adalah corridor bonus. Nilainya 0,10 jika obstacle berada pada corridor lintasan dan 0 jika tidak.
+
+## 5. Fungsi Keanggotaan
+
+Sistem menggunakan kombinasi fungsi keanggotaan segitiga dan trapesium. Fungsi segitiga digunakan untuk himpunan tengah, sedangkan fungsi trapesium digunakan untuk himpunan ujung atau shoulder.
+
+### 5.1 Fungsi Segitiga
+
+\[
+\mu(x;a,b,c)=
+\begin{cases}
+0, & x \leq a \text{ atau } x \geq c \\
+\frac{x-a}{b-a}, & a < x \leq b \\
+\frac{c-x}{c-b}, & b < x < c
+\end{cases}
+\]
+
+### 5.2 Fungsi Trapesium
+
+\[
+\mu(x;a,b,c,d)=
+\begin{cases}
+0, & x \leq a \text{ atau } x \geq d \\
+\frac{x-a}{b-a}, & a < x < b \\
+1, & b \leq x \leq c \\
+\frac{d-x}{d-c}, & c < x < d
+\end{cases}
+\]
+
+## 6. Rule Base
+
+Rule base terdiri dari 27 aturan karena sistem memiliki 3 input fuzzy, masing-masing dengan 3 himpunan linguistik.
+
+Jumlah rule:
+
+\[
+3 \times 3 \times 3 = 27
+\]
+
+Bentuk umum rule Mamdani yang digunakan adalah:
+
+\[
+\text{IF } L \text{ is } A_1 \text{ AND } P \text{ is } A_2 \text{ AND } U \text{ is } A_3
+\]
+
+\[
+\text{THEN Risk is } B_1, \text{ Speed is } B_2, \text{ Turn is } B_3
+\]
+
+Operator AND dihitung menggunakan minimum:
+
+\[
+\alpha_i = \min(\mu_{A_1}(L), \mu_{A_2}(P), \mu_{A_3}(U))
+\]
+
+Output dari beberapa rule yang menghasilkan himpunan sama digabungkan menggunakan maksimum:
+
+\[
+\mu_B(y) = \max(\mu_{B_1}(y), \mu_{B_2}(y), ..., \mu_{B_n}(y))
+\]
+
+Defuzzifikasi dilakukan dengan metode centroid:
+
+\[
+y^* =
+\frac{\sum_{k=1}^{N} y_k \mu(y_k)}
+{\sum_{k=1}^{N} \mu(y_k)}
+\]
+
+## 7. Struktur Repository
 
 ```text
 collision_avoidance_mamdani_fuzzy/
-├── fuzzy_controller.py
-├── scenario_generator.py
-├── baseline_crisp.py
-├── usv_simulator.py
-├── plot_results.py
-├── plot_results_report.py
-├── report_tables.py
-├── excel_report_generator.py
-├── main.py
-├── requirements.txt
-├── README.md
-└── results/
+    fuzzy_controller.py
+    fuzzy_lab.py
+    scenario_generator.py
+    usv_simulator.py
+    baseline_crisp.py
+    plot_results.py
+    plot_results_report.py
+    report_tables.py
+    excel_report_generator.py
+    main.py
+    requirements.txt
+    README.md
+    .gitignore
+
+    results/
+        figures/
+        figures_report/
+        fuzzy_lab/
+        lab_runs/
+        report_tables/
+        simulation_data/
+
+    archive/
+        old_one_time_scripts/
+````
+
+Keterangan file utama:
+
+| File                      | Fungsi                                                         |
+| ------------------------- | -------------------------------------------------------------- |
+| fuzzy_controller.py       | Model utama Mamdani Fuzzy Logic Controller                     |
+| fuzzy_lab.py              | Alat simulasi interaktif seperti Fuzzy Logic Toolbox sederhana |
+| scenario_generator.py     | Membuat data skenario obstacle sintetik                        |
+| usv_simulator.py          | Simulasi lintasan USV sederhana                                |
+| baseline_crisp.py         | Pembanding terhadap metode crisp threshold                     |
+| plot_results_report.py    | Membuat grafik hasil simulasi untuk laporan                    |
+| report_tables.py          | Membuat tabel CSV dan ringkasan laporan                        |
+| excel_report_generator.py | Membuat workbook Excel laporan                                 |
+| main.py                   | Menjalankan pipeline utama                                     |
+| requirements.txt          | Daftar library Python yang dibutuhkan                          |
+
+## 8. Instalasi
+
+Program dibuat menggunakan Python 3.10. Library yang digunakan dapat dipasang melalui terminal.
+
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-Penjelasan file:
-
-| File                        | Fungsi                                                 |
-| --------------------------- | ------------------------------------------------------ |
-| `fuzzy_controller.py`       | Implementasi Mamdani Fuzzy Logic Controller.           |
-| `scenario_generator.py`     | Membuat data skenario obstacle dan log simulasi fuzzy. |
-| `baseline_crisp.py`         | Membuat pembanding berbasis rule threshold/crisp.      |
-| `usv_simulator.py`          | Membuat simulasi lintasan sederhana USV.               |
-| `plot_results.py`           | Membuat grafik dasar hasil simulasi.                   |
-| `plot_results_report.py`    | Membuat grafik versi laporan dengan format lebih rapi. |
-| `report_tables.py`          | Membuat tabel CSV dan ringkasan laporan.               |
-| `excel_report_generator.py` | Membuat workbook Excel laporan.                        |
-| `main.py`                   | Menjalankan seluruh pipeline secara otomatis.          |
-
----
-
-## 4. Input Fuzzy Controller
-
-Fuzzy controller menggunakan tiga input utama:
-
-### 4.1 Posisi Lateral Obstacle
-
-Input ini menunjukkan posisi obstacle terhadap frame kamera.
-
-| Nilai | Makna                                |
-| ----- | ------------------------------------ |
-| -1    | Obstacle berada di kiri frame        |
-| 0     | Obstacle berada di tengah / corridor |
-| +1    | Obstacle berada di kanan frame       |
-
-Membership function:
-
-* `kiri`
-* `tengah`
-* `kanan`
-
-### 4.2 Kedekatan Visual
-
-Input ini menunjukkan indikasi kedekatan obstacle secara visual berdasarkan posisi bawah bounding box dan area bounding box.
-
-Membership function:
-
-* `jauh`
-* `sedang`
-* `dekat`
-
-Catatan: nilai ini bukan jarak meter absolut. Kamera monocular tidak mengukur jarak fisik secara langsung.
-
-### 4.3 Urgensi Pendekatan
-
-Input ini menunjukkan seberapa cepat obstacle terlihat mendekat berdasarkan visual TTC dan pertumbuhan ukuran bounding box.
-
-Membership function:
-
-* `rendah`
-* `sedang`
-* `tinggi`
-
----
-
-## 5. Output Fuzzy Controller
-
-Fuzzy controller menghasilkan tiga bentuk output utama:
-
-| Output  | Makna                                  |
-| ------- | -------------------------------------- |
-| `speed` | Faktor kecepatan USV, 0 sampai 1       |
-| `turn`  | Bias belok, -1 kiri, 0 lurus, +1 kanan |
-| `risk`  | Skor risiko kontinu, 0 sampai 1        |
-
-Output kemudian diklasifikasikan menjadi:
-
-| Risk class |            Rentang | Command                   |
-| ---------- | -----------------: | ------------------------- |
-| LOW        |        risk < 0,30 | `HOLD_COURSE`             |
-| MEDIUM     | 0,30 ≤ risk < 0,60 | `SLOW_DOWN` / `TURN_SLOW` |
-| HIGH       |        risk ≥ 0,60 | `STOP`                    |
-
----
-
-## 6. Skenario Simulasi
-
-Project ini menggunakan lima skenario utama:
-
-| Skenario                  | Tujuan                                              |
-| ------------------------- | --------------------------------------------------- |
-| `no_obstacle`             | Menguji kondisi tanpa obstacle.                     |
-| `side_safe_obstacle`      | Menguji obstacle samping yang tidak masuk corridor. |
-| `frontal_static_obstacle` | Menguji obstacle frontal yang berisiko tinggi.      |
-| `crossing_left_to_right`  | Menguji obstacle crossing dari kiri ke kanan.       |
-| `crossing_right_to_left`  | Menguji obstacle crossing dari kanan ke kiri.       |
-
----
-
-## 7. Cara Instalasi
-
-Disarankan menjalankan project ini di virtual environment.
-
-### Windows PowerShell
+Jika belum menggunakan virtual environment, disarankan membuat environment terlebih dahulu.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-Jika aktivasi virtual environment diblokir PowerShell, jalankan:
+## 9. Cara Menjalankan Program Utama
 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\Activate.ps1
-```
-
----
-
-## 8. Cara Menjalankan Program
-
-Untuk menjalankan seluruh pipeline:
+Untuk menjalankan seluruh pipeline simulasi:
 
 ```powershell
 python main.py
 ```
 
-Sebelum menjalankan ulang pipeline, pastikan file Excel berikut sedang tidak terbuka:
+Program akan menghasilkan data simulasi, grafik, tabel laporan, dan workbook Excel.
+
+Output utama berada pada folder:
 
 ```text
-results/report_tables/laporan_simulasi_fuzzy_seano.xlsx
+results/
 ```
 
-Jika file Excel masih terbuka, Python tidak dapat menimpa file tersebut.
+## 10. Cara Menggunakan Fuzzy Lab
 
----
+`fuzzy_lab.py` adalah alat simulasi interaktif yang dibuat sebagai pengganti MATLAB Fuzzy Logic Toolbox versi ringan.
 
-## 9. Output Program
+Jalankan:
 
-Setelah `main.py` berhasil dijalankan, output utama berada pada folder `results/`.
+```powershell
+python fuzzy_lab.py
+```
 
-### 9.1 Output Data
-
-| File                                 | Isi                                     |
-| ------------------------------------ | --------------------------------------- |
-| `results/simulation_log.csv`         | Log lengkap hasil fuzzy controller.     |
-| `results/simulation_summary.csv`     | Ringkasan hasil fuzzy per skenario.     |
-| `results/baseline_crisp_log.csv`     | Log pembanding baseline crisp.          |
-| `results/baseline_crisp_summary.csv` | Ringkasan perbandingan fuzzy dan crisp. |
-| `results/usv_trajectory_log.csv`     | Log simulasi lintasan USV.              |
-| `results/usv_trajectory_summary.csv` | Ringkasan simulasi lintasan USV.        |
-| `results/run_summary.txt`            | Ringkasan eksekusi pipeline.            |
-
-### 9.2 Output Grafik
-
-Grafik dasar:
+Menu yang tersedia:
 
 ```text
-results/figures/
+1. Hitung dari data vision mentah
+2. Hitung dari input fuzzy langsung
+3. Buat grafik membership function
+4. Buat surface viewer
+5. Jalankan demo obstacle depan transisi
+6. Tampilkan rule base 27 aturan
+0. Keluar
 ```
 
-Grafik versi laporan:
+### 10.1 Demo Obstacle Depan Transisi
+
+Pilih menu:
 
 ```text
-results/figures_report/
+5
 ```
 
-Grafik yang direkomendasikan untuk laporan:
-
-| File                                         | Fungsi                                    |
-| -------------------------------------------- | ----------------------------------------- |
-| `G02_membership_visual_proximity.png`        | Fungsi keanggotaan kedekatan visual.      |
-| `G03_membership_approach_urgency.png`        | Fungsi keanggotaan urgensi pendekatan.    |
-| `G10_risk_frontal_static_obstacle.png`       | Risk score pada obstacle frontal.         |
-| `G30_command_frontal_static_obstacle.png`    | Command decision pada obstacle frontal.   |
-| `G40_trajectory_frontal_static_obstacle.png` | Lintasan USV pada obstacle frontal.       |
-| `G40_trajectory_crossing_left_to_right.png`  | Lintasan USV pada crossing kiri ke kanan. |
-| `G60_surface_risk_center_obstacle.png`       | Surface risk fuzzy untuk obstacle tengah. |
-
-### 9.3 Output Tabel Laporan
+Contoh hasil:
 
 ```text
-results/report_tables/
+Lateral Position : 0.000
+Visual Proximity : 0.699
+Approach Urgency : 0.781
+
+Risk Score       : 0.717
+Speed Factor     : 0.278
+Turn Bias        : 0.637
+Risk Class       : HIGH
+Command          : STOP
 ```
 
-File penting:
+Hasil tersebut menunjukkan bahwa obstacle berada pada kondisi risiko tinggi sehingga command akhir yang diberikan adalah STOP.
 
-| File                                   | Fungsi                               |
-| -------------------------------------- | ------------------------------------ |
-| `tabel_1_ringkasan_fuzzy_rapih.csv`    | Tabel ringkasan fuzzy.               |
-| `tabel_2_ringkasan_lintasan_rapih.csv` | Tabel ringkasan lintasan.            |
-| `tabel_3_validasi_skenario_rapih.csv`  | Tabel validasi skenario.             |
-| `tabel_laporan_rapih.md`               | Tabel laporan dalam format Markdown. |
-| `ringkasan_laporan_rapih.txt`          | Ringkasan naratif hasil simulasi.    |
-| `laporan_simulasi_fuzzy_seano.xlsx`    | Workbook Excel laporan.              |
+### 10.2 Input Data Vision Mentah
 
----
-
-## 10. Hasil Utama Simulasi
-
-Hasil simulasi menunjukkan bahwa fuzzy controller dapat membedakan kondisi aman, crossing, dan obstacle frontal.
-
-Ringkasan interpretasi:
-
-1. Pada skenario tanpa obstacle, sistem mempertahankan `HOLD_COURSE`.
-2. Pada obstacle samping aman, sistem tetap `HOLD_COURSE` karena obstacle tidak masuk corridor.
-3. Pada obstacle frontal statis, sistem meningkatkan risk hingga kelas `HIGH` dan menghasilkan command `STOP`.
-4. Pada skenario crossing, sistem menghasilkan respons kelas `MEDIUM` tanpa langsung masuk `STOP`.
-5. Skenario crossing kiri ke kanan menjadi kondisi paling kritis dalam simulasi, sehingga perlu diberi perhatian pada pengembangan atau validasi berikutnya.
-
----
-
-## 11. Baseline Crisp
-
-Project ini menyertakan `baseline_crisp.py` sebagai pembanding.
-
-Baseline crisp menggunakan rule threshold sederhana untuk menghasilkan risk class dan command. Pembanding ini digunakan untuk menunjukkan perbedaan antara pendekatan crisp dan fuzzy.
-
-Fuzzy controller tetap menjadi metode utama, sedangkan baseline crisp hanya digunakan sebagai referensi pembanding.
-
----
-
-## 12. Catatan untuk Laporan
-
-Kalimat yang aman digunakan dalam laporan:
-
-> Simulasi ini digunakan sebagai validasi awal terhadap rancangan Mamdani Fuzzy Logic Controller sebelum implementasi pada sistem fisik. Hasil simulasi menunjukkan bahwa sistem mampu membedakan kondisi aman, crossing, dan frontal obstacle melalui perubahan risk class dan command. Namun, karena model yang digunakan masih berupa model kinematik sederhana, hasil ini belum dapat dianggap sebagai validasi keselamatan fisik final.
-
-Kalimat yang tidak disarankan:
-
-> Sistem ini telah terbukti aman secara fisik berdasarkan simulasi.
-
-Kalimat tersebut terlalu kuat dan tidak tepat karena belum ada pengujian fisik langsung pada USV nyata.
-
----
-
-## 13. Catatan Git
-
-File yang sebaiknya tidak ikut di-push:
+Pilih menu:
 
 ```text
-.venv/
-__pycache__/
-*.pyc
-~$*.xlsx
+1
 ```
 
-Folder `results/` boleh di-push jika hasil simulasi perlu disertakan sebagai bukti. Jika repository ingin lebih ringan, simpan hanya grafik dan tabel final yang diperlukan.
+Masukkan parameter berikut:
 
----
+| Parameter       | Keterangan                                            |
+| --------------- | ----------------------------------------------------- |
+| x_center        | Posisi pusat bounding box pada sumbu horizontal citra |
+| bbox_bottom     | Posisi bawah bounding box                             |
+| bbox_area_ratio | Rasio area bounding box                               |
+| visual_ttc      | Visual time-to-collision                              |
+| dlog_area       | Perubahan logaritmik area bounding box                |
+| in_corridor     | Status obstacle terhadap corridor lintasan            |
 
-## 14. Status Project
+Program akan menghitung input fuzzy, rule aktif, output crisp, risk class, dan command akhir.
 
-Status saat ini:
+### 10.3 Input Fuzzy Langsung
 
-* Fuzzy controller selesai.
-* Scenario generator selesai.
-* Baseline crisp selesai.
-* Simulasi lintasan selesai.
-* Grafik laporan selesai.
-* Tabel laporan selesai.
-* Workbook Excel laporan selesai.
-* Pipeline otomatis `main.py` selesai.
+Pilih menu:
 
-Project siap digunakan sebagai dasar laporan teknik Kendali Cerdas.
+```text
+2
+```
+
+Masukkan nilai:
+
+```text
+Lateral Position
+Visual Proximity
+Approach Urgency
+```
+
+Mode ini digunakan jika pengguna ingin menguji langsung nilai input fuzzy tanpa memasukkan data visual mentah.
+
+### 10.4 Membuat Membership Function
+
+Pilih menu:
+
+```text
+3
+```
+
+Output akan tersimpan pada:
+
+```text
+results/fuzzy_lab/
+```
+
+### 10.5 Membuat Surface Viewer
+
+Pilih menu:
+
+```text
+4
+```
+
+Contoh konfigurasi surface viewer utama:
+
+```text
+Output: risk
+Sumbu X: proximity
+Sumbu Y: urgency
+Lateral Position tetap: 0.00
+Mesh point: 41
+```
+
+Surface viewer digunakan untuk melihat hubungan dua input fuzzy terhadap satu output fuzzy. Karena sistem memiliki tiga input, satu input harus dibuat tetap.
+
+## 11. Output Program
+
+Program menghasilkan beberapa jenis output.
+
+| Folder                  | Isi                                           |
+| ----------------------- | --------------------------------------------- |
+| results/figures         | Grafik simulasi awal                          |
+| results/figures_report  | Grafik final untuk laporan                    |
+| results/fuzzy_lab       | Grafik hasil Fuzzy Lab                        |
+| results/lab_runs        | Hasil perhitungan per kasus dari Fuzzy Lab    |
+| results/report_tables   | Tabel CSV, ringkasan TXT, dan workbook Excel  |
+| results/simulation_data | Folder untuk menyimpan data simulasi tambahan |
+
+Contoh file output:
+
+```text
+simulation_log.csv
+simulation_summary.csv
+usv_trajectory_log.csv
+usv_trajectory_summary.csv
+laporan_simulasi_fuzzy_seano.xlsx
+output_aggregation.png
+active_rules.csv
+result_summary.txt
+```
+
+## 12. Contoh Analisis Kasus
+
+Pada kasus obstacle depan transisi, data visual yang digunakan adalah:
+
+| Parameter       |  Nilai |
+| --------------- | -----: |
+| x_center        |   0.50 |
+| bbox_bottom     |   0.80 |
+| bbox_area_ratio |   0.23 |
+| visual_ttc      | 2.80 s |
+| dlog_area       |   0.11 |
+| in_corridor     |   True |
+
+Hasil normalisasi:
+
+| Input Fuzzy      | Nilai |
+| ---------------- | ----: |
+| Lateral Position | 0.000 |
+| Visual Proximity | 0.699 |
+| Approach Urgency | 0.781 |
+
+Hasil defuzzifikasi:
+
+| Output       | Nilai |
+| ------------ | ----: |
+| Risk Score   | 0.717 |
+| Speed Factor | 0.278 |
+| Turn Bias    | 0.637 |
+
+Karena nilai risk score lebih besar dari 0,60, maka sistem mengklasifikasikan kondisi sebagai HIGH.
+
+[
+R = 0.717
+]
+
+[
+R \geq 0.60
+]
+
+[
+\text{Risk Class} = \text{HIGH}
+]
+
+Command akhir:
+
+```text
+STOP
+```
+
+Keputusan STOP diprioritaskan karena obstacle berada pada kondisi risiko tinggi. Walaupun turn bias menunjukkan kecenderungan belok kanan, command STOP tetap dipilih sebagai respons konservatif untuk keselamatan navigasi.
+
+## 13. Catatan Engineering
+
+Program ini adalah alat simulasi dan analisis fuzzy untuk tugas Kendali Cerdas. Hasil simulasi dapat digunakan untuk mendukung pembahasan rancangan sistem, tetapi tidak boleh dianggap sebagai validasi keselamatan fisik final.
+
+Validasi keselamatan fisik tetap harus dilakukan melalui pengujian langsung pada USV SEANO dengan prosedur pengujian yang aman, terdokumentasi, dan diawasi operator.
+
+## 14. Cara Push Perubahan ke GitHub
+
+Cek status repository:
+
+```powershell
+git status
+```
+
+Tambahkan file yang berubah:
+
+```powershell
+git add README.md
+git add fuzzy_lab.py
+git add results
+git add archive
+git add .gitignore
+```
+
+Commit:
+
+```powershell
+git commit -m "Update README and document fuzzy lab workflow"
+```
+
+Push ke GitHub:
+
+```powershell
+git push origin main
+```
+
+Jika tidak ada perubahan baru, Git akan menampilkan pesan bahwa working tree sudah bersih.
+
+## 15. Lisensi dan Penggunaan
+
+Repository ini dibuat untuk kebutuhan akademik pada tugas Kendali Cerdas dan pengembangan Tugas Akhir terkait collision avoidance USV SEANO. Program dapat dikembangkan lebih lanjut untuk integrasi dengan sistem nyata, tetapi setiap integrasi ke perangkat fisik harus melalui validasi teknis dan pengujian keselamatan yang memadai.
+
+````
